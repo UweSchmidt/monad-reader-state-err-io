@@ -1,0 +1,40 @@
+Name:                monad-reader-state-err-io
+Version:             0.1.0
+Synopsis:            Reader State IO Error Monad
+Description:         Reader State IO Error Monad
+License:             BSD3
+Author:              Uwe Schmidt
+Maintainer:          uwe@fh-wedel.de
+Copyright:           2018 Uwe Schmidt
+Category:            Control
+Build-type:          Simple
+Cabal-version:       >=1.10
+
+
+Library
+  Exposed-modules:   Control.Monad.ReaderStateErrIO
+
+  Hs-Source-Dirs:    .
+
+  ghc-options: -Wall -fwarn-tabs
+
+  default-language:   Haskell2010
+  
+  default-extensions: MultiParamTypeClasses FunctionalDependencies FlexibleInstances
+
+  Build-depends:       base          >= 4   && < 5
+                     , process       >= 1.2
+                     , mtl           >= 2.2
+                     , transformers  >= 0.4
+
+-- test-suite rws-e-io
+--   main-is:             RWSTest.hs
+--   type:                exitcode-stdio-1.0
+-- 
+--   build-depends:       base
+--                      , monad-error-rws-io
+--                      , process
+--                      , mtl
+--                      , transformers
+--   hs-source-dirs:      .
+--   ghc-options:         -Wall  -fwarn-tabs
