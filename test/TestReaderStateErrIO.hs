@@ -6,11 +6,12 @@ import Control.Monad.ReaderStateErrIO
 import System.Environment
 import System.Exit
 import System.IO
+import System.Random
 
 main :: IO ()
 main
     = do args <- getArgs
-         res <- evalAction (test args) defaultEnv 0
+         res  <- evalAction (test args) defaultEnv initSt
          maybe
            exitFailure
            return
@@ -29,31 +30,59 @@ defaultEnv :: Env
 defaultEnv = Env { flagTrace   = True
                  , flagVerbose = True
                  }
-type St = Int
+
+-- state wi a counter and a random generator
+-- this may be configured in initSt
+data St = St { cnt :: Int
+             , rnd :: StdGen
+             }
+            deriving Show
 
 initSt :: St
-initSt = 0
+initSt = St { cnt = 0
+            , rnd = mkStdGen 42
+            }
 
 type Test = Action Env St
+
+incrCnt :: Test ()
+incrCnt = do
+  trc "increment state cnt"
+  modify (\s -> s {cnt = cnt s + 1})
+
+dice :: Test Int
+dice = do
+  St c rg <- get
+  let (d, rg') = randomR (1, 6) rg
+  put (St c rg')
+  trc $ "new dice = " ++ show d
+  return d
+
+-- use the system random generator
+sysDice :: Test Int
+sysDice = io $ randomRIO (1, 6)
+
 
 test :: [String] -> Test ()
 test args
     = do trc "script started"
 
          trc "io test"
-         io $ putStrLn . show $ args
+         io (putStrLn $ "the command line args = " ++ show args)
 
          -- state actions
          s0 <- get
          trc $ "initial state = " ++ show s0
 
-         put (s0 + 1)
-         s1 <- get
-         trc $ "next state = " ++ show s1
+         incrCnt
+         c1 <- gets cnt
+         trc $ "next count = " ++ show c1
 
-         modify (+ 41)
-         s2 <- get
-         trc $ "next state = " ++ show s2
+         dices <- sequence $ replicate 10 dice
+         trc $ "next 10 dices = " ++ show dices
+
+         sd <- sysDice
+         verbose $ "a dice generated with sys gen = " ++ show sd
 
          -- environment actions
          e <- ask
@@ -64,9 +93,8 @@ test args
 
          local (\ env -> env {flagTrace = False}) $ do
            trc "this log message is suppressed"
-           modify (* 2)
-           s3 <- get
-           verbose $ "state is now = " ++ show s3
+           d <- dice
+           verbose $ "next dice = " ++ show d
 
          -- action combinators
          trc "always test"
