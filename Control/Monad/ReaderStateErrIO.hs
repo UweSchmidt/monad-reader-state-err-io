@@ -3,12 +3,14 @@ module Control.Monad.ReaderStateErrIO
     , module Control.Monad.Trans.Except
     , module Control.Monad.Reader
     , module Control.Monad.State.Strict
+    , module Control.Monad.Except
     , module Control.Monad
     )
 where
 
 import Control.Exception        ( IOException, try )
 
+import Control.Monad.Except
 import Control.Monad.Trans.Except
 import Control.Monad.Reader
 import Control.Monad.State.Strict
