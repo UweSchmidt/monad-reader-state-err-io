@@ -41,7 +41,7 @@ executable test-reader-state-err-io
                      , random
 
   hs-source-dirs:      . test
-  ghc-options:         -Wall  -fwarn-tabs
+  ghc-options:         -Wall -fwarn-tabs -threaded
 
   default-language:   Haskell2010
   
